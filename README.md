@@ -67,11 +67,11 @@ URLパラメータを使用することで、表示される日付と時刻の�
    **表示例:**
    ![日付赤白、時刻青黄](example3.png)
 
-4. **日付を中央揃え、時刻はデフォルト（中央揃え）に設定:**
+4. **日付を中央揃えに設定:**
    `https://murahito130.github.io/datetime.html?dateAlign=center`
 
    **表示例:**
-   ![日付中央、時刻デフォルト](example4.png)
+   ![日付を中央揃え](example4.png)
 
 5. **すべてのパラメータを組み合わせて設定:**
    `https://murahito130.github.io/datetime.html?bgColor=333333&containerBgColor=E0E0E0&dateBgColor=FFD700&dateTextColor=8B4513&timeBgColor=ADD8E6&timeTextColor=000080&dateAlign=right`
