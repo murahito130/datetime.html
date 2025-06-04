@@ -20,37 +20,49 @@ URLパラメータを追加することで、表示をカスタマイズでき�
 
 ## カスタマイズ
 
-URLパラメータを使用することで、表示される日付と時刻の背景色、文字色、配置を柔軟にカスタマイズできます。
+URLパラメータを使用することで、表示される日付と時刻の背景色、文字色、配置、**文字サイズ、全体のサイズ**を柔軟にカスタマイズできます。
 
 ### 利用可能なパラメータ
 
 * **`bgColor`**: ページ全体の背景色。
-
+  * デフォルト値: `transparent`
   * 例: `bgColor=000000` (黒), `bgColor=red`
 
 * **`containerBgColor`**: メインコンテナの背景色。
-
+  * デフォルト値: `FFFFFF` (白)
   * 例: `containerBgColor=FFFFFF` (白)
 
 * **`dateBgColor`**: 日付表示部分の背景色。
-
+  * デフォルト値: `E2BEE6`
   * 例: `dateBgColor=E2BEE6`
 
 * **`dateTextColor`**: 日付表示部分の文字色。
-
+  * デフォルト値: `6D2A84`
   * 例: `dateTextColor=6D2A84`
 
 * **`timeBgColor`**: 時刻表示部分の背景色。
-
+  * デフォルト値: `CD93D7`
   * 例: `timeBgColor=CD93D7`
 
 * **`timeTextColor`**: 時刻表示部分の文字色。
-
+  * デフォルト値: `48148A`
   * 例: `timeTextColor=48148A`
 
 * **`dateAlign`**: 日付表示のテキストアラインメント。
-
+  * デフォルト値: `left`
   * 値: `left`, `center`, `right`
+
+* **`dateFontSize`**: 日付表示部分の文字サイズ。
+  * デフォルト値: なし (CSSで設定されたデフォルト値が適用されます)
+  * 例: `dateFontSize=1.5em`, `dateFontSize=24px`
+
+* **`timeFontSize`**: 時刻表示部分の文字サイズ。
+  * デフォルト値: なし (CSSで設定されたデフォルト値が適用されます)
+  * 例: `timeFontSize=4em`, `timeFontSize=72px`
+
+* **`scale`**: 全体の表示サイズ（拡大・縮小）。
+  * デフォルト値: なし (CSSで設定されたデフォルト値が適用されます)
+  * 例: `scale=0.8` (80%に縮小), `scale=1.2` (120%に拡大)
 
 **色の指定について:**
 色の値は、`RRGGBB`形式の16進数コード（例: `FF0000`）またはCSSのカラーネーム（例: `red`）で指定できます。
