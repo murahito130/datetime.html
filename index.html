@@ -170,7 +170,6 @@
             const dateDisplayWrapper = document.getElementById('date-display-wrapper');
             const timeDisplayWrapper = document.getElementById('time-display-wrapper');
 
-
             // Apply background color to body
             body.style.backgroundColor = formatColor(params.bgColor || 'transparent');
 
@@ -185,7 +184,7 @@
             timeDisplay.style.backgroundColor = formatColor(params.timeBgColor || '#CD93D7');
             timeDisplay.style.color = formatColor(params.timeTextColor || '#48148A');
 
-            // Determine justify-content value based on alignment parameter
+            // Determine justify-content value based on dateAlign parameter
             const dateAlignment = params.dateAlign || 'left'; // Default to 'left'
             let dateJustifyValue;
             switch (dateAlignment) {
@@ -202,21 +201,22 @@
             }
             dateDisplayWrapper.style.justifyContent = dateJustifyValue;
 
-            const timeAlignment = params.timeAlign || 'left'; // Default to 'left'
-            let timeJustifyValue;
-            switch (timeAlignment) {
-                case 'left':
-                    timeJustifyValue = 'flex-start';
-                    break;
-                case 'right':
-                    timeJustifyValue = 'flex-end';
-                    break;
-                case 'center':
-                default:
-                    timeJustifyValue = 'center';
-                    break;
+            // Default time alignment to center as timeAlign parameter is removed
+            timeDisplayWrapper.style.justifyContent = 'center';
+
+            // Apply font sizes if provided
+            if (params.dateFontSize) {
+                dateDisplay.style.fontSize = params.dateFontSize;
             }
-            timeDisplayWrapper.style.justifyContent = timeJustifyValue;
+            if (params.timeFontSize) {
+                timeDisplay.style.fontSize = params.timeFontSize;
+            }
+
+            // Apply overall scale if provided
+            if (params.scale) {
+                mainContainer.style.transform = `scale(${params.scale})`;
+                mainContainer.style.transformOrigin = 'center center'; // Scale from the center
+            }
         });
 
         // Update every second
