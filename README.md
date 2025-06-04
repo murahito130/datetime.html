@@ -8,7 +8,7 @@
 
 GitHub Pagesで公開されている以下のURLから、直接アプリを利用できます。
 
-`https://murahito130.github.io/datetime.html`
+[`https://murahito130.github.io/datetime.html`](https://murahito130.github.io/datetime.html)
 
 URLパラメータを追加することで、表示をカスタマイズできます。
 
@@ -60,31 +60,36 @@ URLパラメータを使用することで、表示される日付と時刻の�
 以下のURLの例は、`https://murahito130.github.io/datetime.html` をベースにしています。
 
 1. **デフォルト設定 (パラメータなし):**
-   `https://murahito130.github.io/datetime.html`
+   https://murahito130.github.io/datetime.html
 
    **表示例:**
+   
    ![デフォルト表示](example1.png)
 
-2. **背景色を黒、メインコンテナの背景色を白に設定:**
-   `https://murahito130.github.io/datetime.html?bgColor=000000&containerBgColor=FFFFFF`
+3. **背景色を黒、メインコンテナの背景色を白に設定:**
+   https://murahito130.github.io/datetime.html?bgColor=000000&containerBgColor=FFFFFF
 
    **表示例:**
+   
    ![背景色黒、コンテナ白](example2.png)
 
-3. **日付表示の背景を赤、文字を白に、時刻表示の背景を青、文字を黄色に設定:**
-   `https://murahito130.github.io/datetime.html?dateBgColor=FF0000&dateTextColor=FFFFFF&timeBgColor=0000FF&timeTextColor=FFFF00`
+5. **日付表示の背景を赤、文字を白に、時刻表示の背景を青、文字を黄色に設定:**
+   https://murahito130.github.io/datetime.html?dateBgColor=FF0000&dateTextColor=FFFFFF&timeBgColor=0000FF&timeTextColor=FFFF00
 
    **表示例:**
+   
    ![日付赤白、時刻青黄](example3.png)
 
-4. **日付を中央揃えに設定:**
-   `https://murahito130.github.io/datetime.html?dateAlign=center`
+7. **日付を中央揃えに設定:**
+   https://murahito130.github.io/datetime.html?dateAlign=center
 
    **表示例:**
+   
    ![日付を中央揃え](example4.png)
 
-5. **すべてのパラメータを組み合わせて設定:**
-   `https://murahito130.github.io/datetime.html?bgColor=333333&containerBgColor=E0E0E0&dateBgColor=FFD700&dateTextColor=8B4513&timeBgColor=ADD8E6&timeTextColor=000080&dateAlign=right`
+9. **すべてのパラメータを組み合わせて設定:**
+   https://murahito130.github.io/datetime.html?bgColor=333333&containerBgColor=E0E0E0&dateBgColor=FFD700&dateTextColor=8B4513&timeBgColor=ADD8E6&timeTextColor=000080&dateAlign=right
 
    **表示例:**
+   
    ![全パラメータ組み合わせ](example5.png)
