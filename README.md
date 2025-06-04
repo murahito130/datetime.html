@@ -20,7 +20,7 @@ URLパラメータを追加することで、表示をカスタマイズでき�
 
 ## カスタマイズ
 
-URLパラメータを使用することで、表示される日付と時刻の背景色、文字色、配置、**文字サイズ、全体のサイズ**を柔軟にカスタマイズできます。
+URLパラメータを使用することで、表示される日付と時刻の背景色、文字色、配置、**文字サイズ、全体のサイズ**を柔軟にカスタマイズできます。また、1分間の進捗を示すプログレスバーの表示を切り替えることも可能です。
 
 ### 利用可能なパラメータ
 
@@ -90,6 +90,11 @@ URLパラメータを使用することで、表示される日付と時刻の�
 
   * 例: `fontFamily=Arial`, `fontFamily="Noto Sans JP"` (スペースを含む場合は引用符で囲む)
 
+* **`showProgressBar`**: 1分間の進捗を示すプログレスバーの表示・非表示。
+
+  * デフォルト値: `false` (非表示)
+
+  * 値: `true`, `false`
 
 **色の指定について:**
 色の値は、`RRGGBB`形式の16進数コード（例: `FF0000`）またはCSSのカラーネーム（例: `red`）で指定できます。
@@ -105,6 +110,13 @@ URLパラメータを使用することで、表示される日付と時刻の�
    
    ![デフォルト表示](example1.png)
 
+2. **プログレスバーを有効にして表示:**
+   https://murahito130.github.io/datetime.html?showProgressBar=true
+
+   **表示例:**
+   
+   （プログレスバーが時間表示の下部に表示されます）
+
 3. **背景色を黒、メインコンテナの背景色を白に設定:**
    https://murahito130.github.io/datetime.html?bgColor=000000&containerBgColor=FFFFFF
 
@@ -112,21 +124,21 @@ URLパラメータを使用することで、表示される日付と時刻の�
    
    ![背景色黒、コンテナ白](example2.png)
 
-5. **日付表示の背景を赤、文字を白に、時刻表示の背景を青、文字を黄色に設定:**
+4. **日付表示の背景を赤、文字を白に、時刻表示の背景を青、文字を黄色に設定:**
    https://murahito130.github.io/datetime.html?dateBgColor=FF0000&dateTextColor=FFFFFF&timeBgColor=0000FF&timeTextColor=FFFF00
 
    **表示例:**
    
    ![日付赤白、時刻青黄](example3.png)
 
-7. **日付を中央揃えに設定:**
+5. **日付を中央揃えに設定:**
    https://murahito130.github.io/datetime.html?dateAlign=center
 
    **表示例:**
    
    ![日付を中央揃え](example4.png)
 
-9. **すべてのパラメータを組み合わせて設定:**
+6. **すべてのパラメータを組み合わせて設定:**
    https://murahito130.github.io/datetime.html?bgColor=333333&containerBgColor=E0E0E0&dateBgColor=FFD700&dateTextColor=8B4513&timeBgColor=ADD8E6&timeTextColor=000080&dateAlign=right
 
    **表示例:**
