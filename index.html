@@ -12,7 +12,8 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        inter: ['Inter', 'sans-serif'], // Use Inter font
+                        // 'inter' is kept as a fallback or if explicitly used in Tailwind classes
+                        inter: ['Inter', 'sans-serif'],
                     }
                 }
             }
@@ -29,7 +30,7 @@
             align-items: center;
             height: 100vh;
             overflow: hidden; /* Hide scrollbars */
-            font-family: 'Inter', sans-serif; /* Apply Inter font */
+            /* font-family will be set by JS based on parameter or default to Inter */
         }
         /* Main container shadow and rounded corners */
         #main-container {
@@ -217,6 +218,9 @@
                 mainContainer.style.transform = `scale(${params.scale})`;
                 mainContainer.style.transformOrigin = 'center center'; // Scale from the center
             }
+
+            // Apply font family if provided, otherwise default to 'Inter'
+            body.style.fontFamily = params.fontFamily ? `${params.fontFamily}, sans-serif` : 'Inter, sans-serif';
         });
 
         // Update every second
