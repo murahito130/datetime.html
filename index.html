@@ -38,38 +38,53 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-lg */
             display: flex;
             flex-direction: column;
-            width: fit-content; /* Adjust width to content */
+            width: fit-content; /* Reverted to fit-content */
             /* background-color will be set by JS */
         }
+
+        /* Wrapper for date display to handle alignment */
+        #date-display-wrapper,
+        #time-display-wrapper {
+            width: 100%; /* Occupy full width of parent for alignment */
+            display: flex; /* Use flexbox for reliable alignment */
+            /* justify-content will be set by JS */
+        }
+
         /* Date display area */
         #date-display {
             border-radius: 0.5rem; /* rounded-lg */
-            padding: 0.2rem 0.6rem; /* Reduced vertical padding, maintained horizontal */
+            padding: 0.3rem 0.7rem; /* Adjusted padding for better balance */
             margin-bottom: 0.2rem; /* Adjusted spacing */
-            font-size: 0.7em; /* Adjusted to design */
+            font-size: 0.85em; /* Adjusted font size for better balance */
             font-weight: bold; /* font-bold */
             white-space: nowrap; /* Prevent text wrapping */
             /* background-color and color will be set by JS */
-            width: fit-content; /* Adjust width to content */
+            width: fit-content; /* Keep fit-content for background to be near text */
+            /* display: inline-block is no longer needed with flex parent */
             line-height: 1.2; /* Adjust line height for better vertical alignment */
         }
         /* Time display area */
         #time-display {
             border-radius: 0.5rem; /* rounded-lg */
-            padding: 0.4rem 0.8rem; /* Adjusted padding to match image */
+            padding: 0.5rem 1rem; /* Adjusted padding for better balance */
             font-size: 3.5em; /* Adjusted to design */
             font-weight: bold; /* font-bold */
             white-space: nowrap; /* Prevent text wrapping */
             /* background-color and color will be set by JS */
-            width: fit-content; /* Adjust width to content */
+            width: fit-content; /* Keep fit-content for background to be near text */
+            /* display: inline-block is no longer needed with flex parent */
             line-height: 1.2; /* Adjust line height for better vertical alignment */
         }
     </style>
 </head>
 <body>
     <div id="main-container">
-        <div id="date-display"></div>
-        <div id="time-display"></div>
+        <div id="date-display-wrapper">
+            <div id="date-display"></div>
+        </div>
+        <div id="time-display-wrapper">
+            <div id="time-display"></div>
+        </div>
     </div>
 
     <script>
@@ -130,7 +145,7 @@
                 }
             }
 
-            // Time format (e.g., 13:24)
+            // Time format (例: 13:24)
             const timeOptions = {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -152,6 +167,9 @@
             const mainContainer = document.getElementById('main-container');
             const dateDisplay = document.getElementById('date-display');
             const timeDisplay = document.getElementById('time-display');
+            const dateDisplayWrapper = document.getElementById('date-display-wrapper');
+            const timeDisplayWrapper = document.getElementById('time-display-wrapper');
+
 
             // Apply background color to body
             body.style.backgroundColor = formatColor(params.bgColor || 'transparent');
@@ -167,15 +185,38 @@
             timeDisplay.style.backgroundColor = formatColor(params.timeBgColor || '#CD93D7');
             timeDisplay.style.color = formatColor(params.timeTextColor || '#48148A');
 
-            // Apply alignment for date display
+            // Determine justify-content value based on alignment parameter
             const dateAlignment = params.dateAlign || 'left'; // Default to 'left'
-            dateDisplay.classList.remove('text-left', 'text-center', 'text-right');
-            dateDisplay.classList.add(`text-${dateAlignment}`);
+            let dateJustifyValue;
+            switch (dateAlignment) {
+                case 'left':
+                    dateJustifyValue = 'flex-start';
+                    break;
+                case 'right':
+                    dateJustifyValue = 'flex-end';
+                    break;
+                case 'center':
+                default:
+                    dateJustifyValue = 'center';
+                    break;
+            }
+            dateDisplayWrapper.style.justifyContent = dateJustifyValue;
 
-            // Apply alignment for time display
-            const timeAlignment = params.timeAlign || 'center'; // Default to 'center'
-            timeDisplay.classList.remove('text-left', 'text-center', 'text-right');
-            timeDisplay.classList.add(`text-${timeAlignment}`);
+            const timeAlignment = params.timeAlign || 'left'; // Default to 'left'
+            let timeJustifyValue;
+            switch (timeAlignment) {
+                case 'left':
+                    timeJustifyValue = 'flex-start';
+                    break;
+                case 'right':
+                    timeJustifyValue = 'flex-end';
+                    break;
+                case 'center':
+                default:
+                    timeJustifyValue = 'center';
+                    break;
+            }
+            timeDisplayWrapper.style.justifyContent = timeJustifyValue;
         });
 
         // Update every second
