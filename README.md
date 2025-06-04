@@ -51,19 +51,19 @@ URLパラメータを使用することで、表示される日付と時刻の�
 
 ### URLパラメータの例
 
-`https://your-domain.com/datatime.html/index.html` の部分を、実際にデプロイするURLに置き換えて使用してください。
+以下のURLの例は、`https://murahito130.github.io/datetime.html` をベースにしています。
 
 1. **デフォルト設定 (パラメータなし):**
-   `https://your-domain.com/datatime.html/index.html`
+   `https://murahito130.github.io/datetime.html`
 
 2. **背景色を黒、メインコンテナの背景色を白に設定:**
-   `https://your-domain.com/datatime.html/index.html?bgColor=000000&containerBgColor=FFFFFF`
+   `https://murahito130.github.io/datetime.html?bgColor=000000&containerBgColor=FFFFFF`
 
 3. **日付表示の背景を赤、文字を白に、時刻表示の背景を青、文字を黄色に設定:**
-   `https://your-domain.com/datatime.html/index.html?dateBgColor=FF0000&dateTextColor=FFFFFF&timeBgColor=0000FF&timeTextColor=FFFF00`
+   `https://murahito130.github.io/datetime.html?dateBgColor=FF0000&dateTextColor=FFFFFF&timeBgColor=0000FF&timeTextColor=FFFF00`
 
 4. **日付を中央揃え、時刻を右揃えに設定:**
-   `https://your-domain.com/datatime.html/index.html?dateAlign=center&timeAlign=right`
+   `https://murahito130.github.io/datetime.html?dateAlign=center&timeAlign=right`
 
 5. **すべてのパラメータを組み合わせて設定:**
-   `https://your-domain.com/datatime.html/index.html?bgColor=333333&containerBgColor=E0E0E0&dateBgColor=FFD700&dateTextColor=8B4513&timeBgColor=ADD8E6&timeTextColor=000080&dateAlign=right&timeAlign=center`
+   `https://murahito130.github.io/datetime.html?bgColor=333333&containerBgColor=E0E0E0&dateBgColor=FFD700&dateTextColor=8B4513&timeBgColor=ADD8E6&timeTextColor=000080&dateAlign=right&timeAlign=center`
