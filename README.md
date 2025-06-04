@@ -42,10 +42,6 @@ URLパラメータを使用することで、表示される日付と時刻の�
 
   * 値: `left`, `center`, `right`
 
-* **`timeAlign`**: 時刻表示のテキストアラインメント。
-
-  * 値: `left`, `center`, `right`
-
 **色の指定について:**
 色の値は、`RRGGBB`形式の16進数コード（例: `FF0000`）またはCSSのカラーネーム（例: `red`）で指定できます。
 
@@ -71,14 +67,18 @@ URLパラメータを使用することで、表示される日付と時刻の�
    **表示例:**
    ![日付赤白、時刻青黄](日付表示の背景を赤、文字を白に、時刻表示の背景を青、文字を黄色に設定.png)
 
-4. **日付を中央揃え、時刻を右揃えに設定:**
-   `https://murahito130.github.io/datetime.html?dateAlign=center&timeAlign=right`
+4. **日付を中央揃え、時刻はデフォルト（中央揃え）に設定:**
+   `https://murahito130.io/datetime.html?dateAlign=center`
 
    **表示例:**
    ![日付中央、時刻右](日付を中央揃え、時刻を右揃えに設定.png)
 
 5. **すべてのパラメータを組み合わせて設定:**
-   `https://murahito130.github.io/datetime.html?bgColor=333333&containerBgColor=E0E0E0&dateBgColor=FFD700&dateTextColor=8B4513&timeBgColor=ADD8E6&timeTextColor=000080&dateAlign=right&timeAlign=center`
+   `https://murahito130.github.io/datetime.html?bgColor=333333&containerBgColor=E0E0E0&dateBgColor=FFD700&dateTextColor=8B4513&timeBgColor=ADD8E6&timeTextColor=000080&dateAlign=right`
 
    **表示例:**
    ![全パラメータ組み合わせ](すべてのパラメータを組み合わせて設定.png)
+
+## 開発者向け
+
+このプロジェクトはHTML、CSS (Tailwind CSS)、JavaScriptで構成されています。
