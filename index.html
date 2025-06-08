@@ -104,7 +104,7 @@
         let dateDisplayWrapper;
         let timeDisplay;
         let timeDisplayWrapper;
-        let urlParams;
+        let urlParams; 
 
         // Intl.DateTimeFormat インスタンスをキャッシュするための変数
         let cachedDateFormatter;
@@ -172,60 +172,17 @@
         function updateDateTime() {
             const now = new Date();
 
-            // urlParamsが定義されているか確認
-            if (!urlParams) {
-                console.warn("urlParams is not yet defined. Skipping date/time update.");
-                return;
-            }
+            const dateDisplayFormat = urlParams.dateFormat || 'default'; 
 
-            const dateDisplayFormat = urlParams.dateFormat || 'default';
-            const weekdayDisplayFormat = urlParams.weekdayFormat || 'short';
-
-            let dateOptions = {};
-            let formattedDate = '';
-
-            // 日付の表示形式を設定
-            switch (dateDisplayFormat) {
-                case 'full':
-                    dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-                    break;
-                case 'numeric':
-                    // YYYY/MM/DD 形式
-                    dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
-                    // Intl.DateTimeFormat を使用し、ロケールが異なるセパレータを使用している場合でも YYYY/MM/DD を確保
-                    formattedDate = new Intl.DateTimeFormat(navigator.language, dateOptions).format(now).replace(/\//g, '/');
-                    break;
-                case 'monthday':
-                    dateOptions = { month: 'long', day: 'numeric' };
-                    break;
-                case 'default':
-                default:
-                    dateOptions = { month: 'numeric', day: 'numeric' };
-                    break;
-            }
-
-            // 'none' でなければ曜日を追加
-            if (weekdayDisplayFormat !== 'none') {
-                dateOptions.weekday = weekdayDisplayFormat; // 'long', 'short', 'narrow'
-            }
-            
-            // 'numeric' の場合は既に formattedDate が設定済みなのでスキップ
-            if (dateDisplayFormat !== 'numeric') {
-                // キャッシュされたフォーマッターを使用
-                cachedDateFormatter.currentOptions = dateOptions; // オプションを更新
-                cachedDateFormatter = new Intl.DateTimeFormat(navigator.language, dateOptions);
-                formattedDate = cachedDateFormatter.format(now);
+            let formattedDate = cachedDateFormatter.format(now);
+            // 'numeric' の場合は、Intl.DateTimeFormatがロケールによって異なるセパレータを使用する可能性があるため、常に '/' に置換
+            if (dateDisplayFormat === 'numeric') {
+                formattedDate = formattedDate.replace(/\//g, '/'); 
             }
 
             // タイムゾーンの略語を取得
-            const timeZoneParts = cachedTimeZoneFormatter.formatToParts(now);
-            let timeZoneAbbr = '';
-            for (const part of timeZoneParts) {
-                if (part.type === 'timeZoneName') {
-                    timeZoneAbbr = part.value;
-                    break;
-                }
-            }
+            const timeZoneAbbr = cachedTimeZoneFormatter.formatToParts(now)
+                                .find(part => part.type === 'timeZoneName')?.value || '';
 
             // 時刻のフォーマット (例: 13:24)
             const formattedTime = cachedTimeFormatter.format(now);
@@ -234,10 +191,7 @@
             const seconds = now.getSeconds();
 
             // showProgressBar 設定に基づいてプログレスバーの幅を計算
-            let progressPercentage = 0;
-            if (urlParams.showProgressBar) {
-                progressPercentage = (seconds / 60) * 100;
-            }
+            const progressPercentage = urlParams.showProgressBar ? (seconds / 60) * 100 : 0;
 
             // ::after 擬似要素の幅のためのCSS変数を設定
             document.documentElement.style.setProperty('--progress-width', `${progressPercentage}%`);
@@ -260,7 +214,32 @@
             timeDisplayWrapper = document.getElementById('time-display-wrapper');
 
             // Intl.DateTimeFormat インスタンスをキャッシュ
-            cachedDateFormatter = new Intl.DateTimeFormat(navigator.language, { month: 'numeric', day: 'numeric' }); // 初期オプション
+            // 日付表示形式と曜日表示形式のパラメータ処理
+            const dateDisplayFormat = urlParams.dateFormat || 'default';
+            const weekdayDisplayFormat = urlParams.weekdayFormat || 'short';
+
+            let dateOptions = {};
+            switch (dateDisplayFormat) {
+                case 'full':
+                    dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+                    break;
+                case 'numeric':
+                    dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+                    break;
+                case 'monthday':
+                    dateOptions = { month: 'long', day: 'numeric' };
+                    break;
+                case 'default':
+                default:
+                    dateOptions = { month: 'numeric', day: 'numeric' };
+                    break;
+            }
+
+            if (weekdayDisplayFormat !== 'none') {
+                dateOptions.weekday = weekdayDisplayFormat;
+            }
+            cachedDateFormatter = new Intl.DateTimeFormat(navigator.language, dateOptions);
+            
             cachedTimeZoneFormatter = new Intl.DateTimeFormat(navigator.language, { timeZoneName: 'short' });
             cachedTimeFormatter = new Intl.DateTimeFormat(navigator.language, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
 
