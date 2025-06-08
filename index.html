@@ -122,7 +122,7 @@
             });
             // showProgressBar パラメータの処理
             // 'true' 文字列の場合は true、それ以外は false として扱う。デフォルトは false。
-            params.showProgressBar = params.showProgressBar === 'true' ? true : false;
+            params.showProgressBar = params.showProgressBar === 'true'; // Simplified boolean conversion
             return params;
         }
 
@@ -165,14 +165,49 @@
         function updateDateTime() {
             const now = new Date();
 
-            // Date format (e.g., 6/3 (Tue))
-            const dateOptions = {
-                month: 'numeric',
-                day: 'numeric',
-                weekday: 'short' // Display abbreviated weekday
-            };
-            const dateFormatter = new Intl.DateTimeFormat(navigator.language, dateOptions);
-            const formattedDate = dateFormatter.format(now);
+            // ----------------------------------------------------
+            // 日付表示形式と曜日表示形式のパラメータ処理
+            // ----------------------------------------------------
+            // urlParamsが未定義の場合は、ここで処理を中断するか、デフォルト値を設定
+            if (!urlParams) {
+                console.warn("urlParams is not yet defined. Skipping date/time update.");
+                return;
+            }
+            const dateDisplayFormat = urlParams.dateFormat || 'default'; // デフォルトは'default'
+            const weekdayDisplayFormat = urlParams.weekdayFormat || 'short'; // デフォルトは'short'
+
+            let dateOptions = {};
+            let formattedDate = '';
+
+            // 日付の表示形式を設定
+            switch (dateDisplayFormat) {
+                case 'full':
+                    dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+                    break;
+                case 'numeric':
+                    // YYYY/MM/DD 形式に対応
+                    dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+                    formattedDate = new Intl.DateTimeFormat(navigator.language, dateOptions).format(now).replace(/\//g, '/'); // '/'を保持
+                    break;
+                case 'monthday':
+                    dateOptions = { month: 'long', day: 'numeric' };
+                    break;
+                case 'default': // 既存の動作を維持
+                default:
+                    dateOptions = { month: 'numeric', day: 'numeric' };
+                    break;
+            }
+
+            // 曜日の表示形式を設定（weekdayFormatが'none'でなければ曜日を追加）
+            if (weekdayDisplayFormat !== 'none') {
+                dateOptions.weekday = weekdayDisplayFormat; // 'long', 'short', 'narrow'
+            }
+            
+            // dateDisplayFormatが'numeric'の場合は既にformattedDateを設定済みなのでスキップ
+            if (dateDisplayFormat !== 'numeric') {
+                const dateFormatter = new Intl.DateTimeFormat(navigator.language, dateOptions);
+                formattedDate = dateFormatter.format(now);
+            }
 
             // Get timezone abbreviation
             const timeZoneOptions = {
@@ -200,7 +235,6 @@
             // Get seconds for minute progress animation
             const seconds = now.getSeconds();
 
-            // timeDisplayがnullでないことを確認
             if (!timeDisplay) {
                 return; // 要素がまだ利用できない場合は処理を中断
             }
@@ -213,7 +247,6 @@
 
             // Set the CSS variable for the width of the ::after pseudo-element
             document.documentElement.style.setProperty('--progress-width', `${progressPercentage}%`);
-
 
             // Combine and display date and timezone
             document.getElementById('date-display').textContent = `${formattedDate} (${timeZoneAbbr})`;
@@ -233,7 +266,6 @@
             // DOMContentLoaded内で要素への参照を取得
             timeDisplay = document.getElementById('time-display');
 
-
             // Apply background color to body
             body.style.backgroundColor = formatColor(urlParams.bgColor || 'transparent');
 
@@ -251,7 +283,6 @@
             // Set progress bar color based on timeTextColor with some transparency
             const progressBarBaseColor = formatColor(urlParams.timeTextColor || '#48148A');
             document.documentElement.style.setProperty('--progress-bar-color', hexToRgba(progressBarBaseColor, 0.8));
-
 
             // Determine justify-content value based on dateAlign parameter
             const dateAlignment = urlParams.dateAlign || 'left'; // Default to 'left'
@@ -289,13 +320,13 @@
 
             // Apply font family if provided, otherwise default to 'Inter'
             body.style.fontFamily = urlParams.fontFamily ? `${urlParams.fontFamily}, sans-serif` : 'Inter, sans-serif';
+
+            // Display once on page load AFTER urlParams are initialized
+            updateDateTime();
         });
 
         // Update every second
         setInterval(updateDateTime, 1000);
-
-        // Display once on page load
-        updateDateTime();
     </script>
 </body>
 </html>
