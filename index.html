@@ -12,7 +12,6 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        // 'inter' is kept as a fallback or if explicitly used in Tailwind classes
                         inter: ['Inter', 'sans-serif'],
                     }
                 }
@@ -30,7 +29,6 @@
             align-items: center;
             height: 100vh;
             overflow: hidden; /* Hide scrollbars */
-            /* font-family will be set by JS based on parameter or default to Inter */
         }
         /* Main container shadow and rounded corners */
         #main-container {
@@ -41,7 +39,6 @@
             flex-direction: column;
             width: fit-content; /* Reverted to fit-content */
             position: relative; /* For any future absolute positioning */
-            /* background-color will be set by JS */
         }
 
         /* Wrapper for date display to handle alignment */
@@ -49,7 +46,6 @@
         #time-display-wrapper {
             width: 100%; /* Occupy full width of parent for alignment */
             display: flex; /* Use flexbox for reliable alignment */
-            /* justify-content will be set by JS */
         }
 
         /* Date display area */
@@ -60,7 +56,6 @@
             font-size: 0.85em; /* Adjusted font size for better balance */
             font-weight: bold; /* font-bold */
             white-space: nowrap; /* Prevent text wrapping */
-            /* background-color and color will be set by JS */
             width: fit-content; /* Keep fit-content for background to be near text */
             line-height: 1.2; /* Adjust line height for better vertical alignment */
         }
@@ -71,7 +66,6 @@
             font-size: 3.5em; /* Adjusted to design */
             font-weight: bold; /* font-bold */
             white-space: nowrap; /* Prevent text wrapping */
-            /* background-color and color will be set by JS */
             width: fit-content; /* Keep fit-content for background to be near text */
             line-height: 1.2; /* Adjust line height for better vertical alignment */
             position: relative; /* Needed for absolute positioning of ::after */
@@ -104,9 +98,18 @@
     </div>
 
     <script>
-        // グローバルスコープで要素を宣言
+        // DOM要素とURLパラメータをキャッシュするためのグローバル変数
+        let mainContainer;
+        let dateDisplay;
+        let dateDisplayWrapper;
         let timeDisplay;
-        let urlParams; // URLパラメータをグローバルで保持
+        let timeDisplayWrapper;
+        let urlParams;
+
+        // Intl.DateTimeFormat インスタンスをキャッシュするための変数
+        let cachedDateFormatter;
+        let cachedTimeZoneFormatter;
+        let cachedTimeFormatter;
 
         /**
          * Parses URL parameters and returns them as an object.
@@ -120,20 +123,19 @@
                     params[key] = decodeURIComponent(value);
                 }
             });
-            // showProgressBar パラメータの処理
-            // 'true' 文字列の場合は true、それ以外は false として扱う。デフォルトは false。
-            params.showProgressBar = params.showProgressBar === 'true'; // Simplified boolean conversion
+            // showProgressBar パラメータを真偽値に変換し、デフォルトは false
+            params.showProgressBar = params.showProgressBar === 'true';
             return params;
         }
 
         /**
-         * Converts a hex color string (e.g., "RRGGBB") to a CSS color string (e.g., "#RRGGBB").
-         * If the input is not a 6-digit hex, it returns the input as is (assuming it's a CSS color name).
+         * Formats a color string. If it's a 6-digit hex, it prepends '#'.
+         * Otherwise, it returns the string as is.
          * @param {string} color - The color string.
          * @returns {string} The formatted CSS color string.
          */
         function formatColor(color) {
-            if (color && color.match(/^[0-9A-Fa-f]{6}$/)) {
+            if (typeof color === 'string' && color.match(/^[0-9A-Fa-f]{6}$/)) {
                 return `#${color}`;
             }
             return color;
@@ -147,7 +149,10 @@
          */
         function hexToRgba(hex, alpha) {
             let r = 0, g = 0, b = 0;
-            // Handle hex without '#'
+            if (typeof hex !== 'string') {
+                return `rgba(0, 0, 0, ${alpha})`; // 無効なhexの場合は黒でフォールバック
+            }
+            // '#' なしのhexを処理
             if (hex.startsWith('#')) {
                 hex = hex.slice(1);
             }
@@ -155,6 +160,8 @@
                 r = parseInt(hex.substring(0, 2), 16);
                 g = parseInt(hex.substring(2, 4), 16);
                 b = parseInt(hex.substring(4, 6), 16);
+            } else {
+                return `rgba(0, 0, 0, ${alpha})`; // 無効なhex長の場合は黒でフォールバック
             }
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         }
@@ -165,16 +172,14 @@
         function updateDateTime() {
             const now = new Date();
 
-            // ----------------------------------------------------
-            // 日付表示形式と曜日表示形式のパラメータ処理
-            // ----------------------------------------------------
-            // urlParamsが未定義の場合は、ここで処理を中断するか、デフォルト値を設定
+            // urlParamsが定義されているか確認
             if (!urlParams) {
                 console.warn("urlParams is not yet defined. Skipping date/time update.");
                 return;
             }
-            const dateDisplayFormat = urlParams.dateFormat || 'default'; // デフォルトは'default'
-            const weekdayDisplayFormat = urlParams.weekdayFormat || 'short'; // デフォルトは'short'
+
+            const dateDisplayFormat = urlParams.dateFormat || 'default';
+            const weekdayDisplayFormat = urlParams.weekdayFormat || 'short';
 
             let dateOptions = {};
             let formattedDate = '';
@@ -185,36 +190,35 @@
                     dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
                     break;
                 case 'numeric':
-                    // YYYY/MM/DD 形式に対応
+                    // YYYY/MM/DD 形式
                     dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
-                    formattedDate = new Intl.DateTimeFormat(navigator.language, dateOptions).format(now).replace(/\//g, '/'); // '/'を保持
+                    // Intl.DateTimeFormat を使用し、ロケールが異なるセパレータを使用している場合でも YYYY/MM/DD を確保
+                    formattedDate = new Intl.DateTimeFormat(navigator.language, dateOptions).format(now).replace(/\//g, '/');
                     break;
                 case 'monthday':
                     dateOptions = { month: 'long', day: 'numeric' };
                     break;
-                case 'default': // 既存の動作を維持
+                case 'default':
                 default:
                     dateOptions = { month: 'numeric', day: 'numeric' };
                     break;
             }
 
-            // 曜日の表示形式を設定（weekdayFormatが'none'でなければ曜日を追加）
+            // 'none' でなければ曜日を追加
             if (weekdayDisplayFormat !== 'none') {
                 dateOptions.weekday = weekdayDisplayFormat; // 'long', 'short', 'narrow'
             }
             
-            // dateDisplayFormatが'numeric'の場合は既にformattedDateを設定済みなのでスキップ
+            // 'numeric' の場合は既に formattedDate が設定済みなのでスキップ
             if (dateDisplayFormat !== 'numeric') {
-                const dateFormatter = new Intl.DateTimeFormat(navigator.language, dateOptions);
-                formattedDate = dateFormatter.format(now);
+                // キャッシュされたフォーマッターを使用
+                cachedDateFormatter.currentOptions = dateOptions; // オプションを更新
+                cachedDateFormatter = new Intl.DateTimeFormat(navigator.language, dateOptions);
+                formattedDate = cachedDateFormatter.format(now);
             }
 
-            // Get timezone abbreviation
-            const timeZoneOptions = {
-                timeZoneName: 'short'
-            };
-            const timeZoneFormatter = new Intl.DateTimeFormat(navigator.language, timeZoneOptions);
-            const timeZoneParts = timeZoneFormatter.formatToParts(now);
+            // タイムゾーンの略語を取得
+            const timeZoneParts = cachedTimeZoneFormatter.formatToParts(now);
             let timeZoneAbbr = '';
             for (const part of timeZoneParts) {
                 if (part.type === 'timeZoneName') {
@@ -223,88 +227,75 @@
                 }
             }
 
-            // Time format (例: 13:24)
-            const timeOptions = {
-                hour: '2-digit',
-                minute: '2-digit',
-                hourCycle: 'h23' // 24-hour display
-            };
-            const timeFormatter = new Intl.DateTimeFormat(navigator.language, timeOptions);
-            const formattedTime = timeFormatter.format(now);
+            // 時刻のフォーマット (例: 13:24)
+            const formattedTime = cachedTimeFormatter.format(now);
 
-            // Get seconds for minute progress animation
+            // 分の進行アニメーションのための秒を取得
             const seconds = now.getSeconds();
 
-            if (!timeDisplay) {
-                return; // 要素がまだ利用できない場合は処理を中断
-            }
-
-            // プログレスバーの表示設定に基づいて幅を計算
+            // showProgressBar 設定に基づいてプログレスバーの幅を計算
             let progressPercentage = 0;
             if (urlParams.showProgressBar) {
                 progressPercentage = (seconds / 60) * 100;
             }
 
-            // Set the CSS variable for the width of the ::after pseudo-element
+            // ::after 擬似要素の幅のためのCSS変数を設定
             document.documentElement.style.setProperty('--progress-width', `${progressPercentage}%`);
 
-            // Combine and display date and timezone
-            document.getElementById('date-display').textContent = `${formattedDate} (${timeZoneAbbr})`;
-            document.getElementById('time-display').textContent = formattedTime;
+            // 日付とタイムゾーンを結合して表示
+            dateDisplay.textContent = `${formattedDate} (${timeZoneAbbr})`;
+            timeDisplay.textContent = formattedTime;
         }
 
-        // Event listener for DOM content loaded
+        // DOMコンテンツが読み込まれたときのイベントリスナー
         document.addEventListener('DOMContentLoaded', () => {
             urlParams = getUrlParams(); // URLパラメータを初期化
 
+            // DOM要素をキャッシュ
             const body = document.body;
-            const mainContainer = document.getElementById('main-container');
-            const dateDisplay = document.getElementById('date-display');
-            const dateDisplayWrapper = document.getElementById('date-display-wrapper');
-            const timeDisplayWrapper = document.getElementById('time-display-wrapper');
-
-            // DOMContentLoaded内で要素への参照を取得
+            mainContainer = document.getElementById('main-container');
+            dateDisplay = document.getElementById('date-display');
+            dateDisplayWrapper = document.getElementById('date-display-wrapper');
             timeDisplay = document.getElementById('time-display');
+            timeDisplayWrapper = document.getElementById('time-display-wrapper');
 
-            // Apply background color to body
+            // Intl.DateTimeFormat インスタンスをキャッシュ
+            cachedDateFormatter = new Intl.DateTimeFormat(navigator.language, { month: 'numeric', day: 'numeric' }); // 初期オプション
+            cachedTimeZoneFormatter = new Intl.DateTimeFormat(navigator.language, { timeZoneName: 'short' });
+            cachedTimeFormatter = new Intl.DateTimeFormat(navigator.language, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+
+
+            // bodyに背景色を適用
             body.style.backgroundColor = formatColor(urlParams.bgColor || 'transparent');
 
-            // Apply background color to main container
+            // メインコンテナに背景色を適用
             mainContainer.style.backgroundColor = formatColor(urlParams.containerBgColor || '#FFFFFF');
 
-            // Apply colors to date display
+            // 日付表示に色を適用
             dateDisplay.style.backgroundColor = formatColor(urlParams.dateBgColor || '#E2BEE6');
             dateDisplay.style.color = formatColor(urlParams.dateTextColor || '#6D2A84');
 
-            // Apply colors to time display
+            // 時刻表示に色を適用
             timeDisplay.style.backgroundColor = formatColor(urlParams.timeBgColor || '#CD93D7');
             timeDisplay.style.color = formatColor(urlParams.timeTextColor || '#48148A');
 
-            // Set progress bar color based on timeTextColor with some transparency
+            // timeTextColor に基づいてプログレスバーの色を設定（透明度を少し加える）
             const progressBarBaseColor = formatColor(urlParams.timeTextColor || '#48148A');
             document.documentElement.style.setProperty('--progress-bar-color', hexToRgba(progressBarBaseColor, 0.8));
 
-            // Determine justify-content value based on dateAlign parameter
-            const dateAlignment = urlParams.dateAlign || 'left'; // Default to 'left'
-            let dateJustifyValue;
-            switch (dateAlignment) {
-                case 'left':
-                    dateJustifyValue = 'flex-start';
-                    break;
-                case 'right':
-                    dateJustifyValue = 'flex-end';
-                    break;
-                case 'center':
-                default:
-                    dateJustifyValue = 'center';
-                    break;
-            }
-            dateDisplayWrapper.style.justifyContent = dateJustifyValue;
+            // dateAlign パラメータに基づいて justify-content の値を決定
+            const dateAlignment = urlParams.dateAlign || 'left'; // デフォルトは 'left'
+            const alignmentMap = {
+                'left': 'flex-start',
+                'right': 'flex-end',
+                'center': 'center'
+            };
+            dateDisplayWrapper.style.justifyContent = alignmentMap[dateAlignment] || 'center';
 
-            // Default time alignment to center as timeAlign parameter is removed
+            // timeAlign パラメータは削除されたため、時刻のアライメントはデフォルトで中央揃え
             timeDisplayWrapper.style.justifyContent = 'center';
 
-            // Apply font sizes if provided
+            // フォントサイズが指定されていれば適用
             if (urlParams.dateFontSize) {
                 dateDisplay.style.fontSize = urlParams.dateFontSize;
             }
@@ -312,21 +303,19 @@
                 timeDisplay.style.fontSize = urlParams.timeFontSize;
             }
 
-            // Apply overall scale if provided
+            // 全体のスケールが指定されていれば適用
             if (urlParams.scale) {
                 mainContainer.style.transform = `scale(${urlParams.scale})`;
-                mainContainer.style.transformOrigin = 'center center'; // Scale from the center
+                mainContainer.style.transformOrigin = 'center center'; // 中央からスケール
             }
 
-            // Apply font family if provided, otherwise default to 'Inter'
+            // フォントファミリーが指定されていれば適用、そうでなければ 'Inter' をデフォルトにする
             body.style.fontFamily = urlParams.fontFamily ? `${urlParams.fontFamily}, sans-serif` : 'Inter, sans-serif';
-
-            // Display once on page load AFTER urlParams are initialized
-            updateDateTime();
+            
+            // 毎秒更新 (初回に一度すぐに呼び出す)
+            setInterval(updateDateTime, 1000);
+            updateDateTime(); // 初期表示
         });
-
-        // Update every second
-        setInterval(updateDateTime, 1000);
     </script>
 </body>
 </html>
